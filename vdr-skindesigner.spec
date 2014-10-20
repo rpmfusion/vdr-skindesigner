@@ -1,10 +1,10 @@
-%global commit  49c6ef552c7964bd60d19380605c14ec21c36e7e
+%global commit  1809656e5826ebea73ce8f337ef5b6a75ce2714f
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global gitdate 20141019
+%global gitdate 20141020
 
 Name:           vdr-skindesigner
 Version:        0.0.1
-Release:        9.%{gitdate}git%{shortcommit}%{?dist}
+Release:        10.%{gitdate}git%{shortcommit}%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
@@ -75,6 +75,9 @@ install -Dpm 644 %{SOURCE1} \
 
 
 %changelog
+* Mon Oct 20 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.1-10.20141020git1809656
+- rebuild for new git release
+
 * Sun Oct 19 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.1-9.20141019git49c6ef5
 - rebuild for new git release
 
