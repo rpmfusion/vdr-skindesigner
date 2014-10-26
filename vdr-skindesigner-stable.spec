@@ -1,16 +1,12 @@
-%global commit  ee39eb8066f977d2adb3be71b6c34a7d6af4a22c
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global gitdate 20141023
-
 Name:           vdr-skindesigner
-Version:        0.0.1
-Release:        12.%{gitdate}git%{shortcommit}%{?dist}
+Version:        0.0.3
+Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
-Source0:        http://projects.vdr-developer.org/git/vdr-plugin-skindesigner.git/snapshot/vdr-plugin-skindesigner-%{commit}.tar.bz2
+Source0:        http://projects.vdr-developer.org/attachments/download/1813/vdr-skindesigner-%{version}.tgz
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
 
@@ -42,7 +38,7 @@ Requires:      %{name} = %{version}-%{release}
 This package contains icons and xml files.
 
 %prep
-%setup -q -n vdr-plugin-skindesigner-%{commit}
+%setup -q -n skindesigner-%{version}
 
 %build
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" IMAGELIB=graphicsmagick %{?_smp_mflags} all
@@ -75,6 +71,9 @@ install -Dpm 644 %{SOURCE1} \
 
 
 %changelog
+* Sun Oct 26 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.3-1
+- Update to 0.0.3
+
 * Sat Oct 25 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.1-12.20141025gitee39eb8
 - rebuild for new git release
 
