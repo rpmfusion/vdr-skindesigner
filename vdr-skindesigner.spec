@@ -1,6 +1,6 @@
 Name:           vdr-skindesigner
 Version:        0.0.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
@@ -16,6 +16,7 @@ BuildRequires:  libcurl-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  freetype-devel
 BuildRequires:  fontconfig-devel
+BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  cairo-devel
 BuildRequires:  librsvg2-devel
 BuildRequires:  GraphicsMagick-c++-devel
@@ -73,6 +74,9 @@ install -Dpm 644 %{SOURCE1} \
 
 
 %changelog
+* Sat Nov 15 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.5-4
+- added BR libjpeg-turbo-devel
+
 * Sat Nov 15 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.5-3
 - added BR librsvg2-devel
 
