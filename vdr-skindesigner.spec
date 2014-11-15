@@ -16,6 +16,7 @@ BuildRequires:  libcurl-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  freetype-devel
 BuildRequires:  fontconfig-devel
+BuildRequires:  cairo-devel
 BuildRequires:  GraphicsMagick-c++-devel
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 Requires:       vdr-softhddevice
@@ -73,6 +74,7 @@ install -Dpm 644 %{SOURCE1} \
 %changelog
 * Sat Nov 15 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.5-1
 - Update to 0.0.5
+- added BR cairo-devel
 
 * Sun Oct 26 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.3-1
 - Update to 0.0.3
