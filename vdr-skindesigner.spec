@@ -1,12 +1,12 @@
 Name:           vdr-skindesigner
-Version:        0.0.3
+Version:        0.0.5
 Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
-Source0:        http://projects.vdr-developer.org/attachments/download/1813/vdr-skindesigner-%{version}.tgz
+Source0:        http://projects.vdr-developer.org/git/vdr-plugin-skindesigner.git/snapshot/vdr-plugin-skindesigner-%{version}.tar.bz2
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
 
@@ -38,7 +38,7 @@ Requires:      %{name} = %{version}-%{release}
 This package contains icons and xml files.
 
 %prep
-%setup -q -n skindesigner-%{version}
+%setup -q -n vdr-plugin-skindesigner-%{version}
 
 %build
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" IMAGELIB=graphicsmagick %{?_smp_mflags} all
@@ -71,6 +71,9 @@ install -Dpm 644 %{SOURCE1} \
 
 
 %changelog
+* Sat Nov 15 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.5-1
+- Update to 0.0.5
+
 * Sun Oct 26 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.3-1
 - Update to 0.0.3
 
