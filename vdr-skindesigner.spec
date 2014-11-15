@@ -1,6 +1,6 @@
 Name:           vdr-skindesigner
 Version:        0.0.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
@@ -16,6 +16,7 @@ BuildRequires:  libcurl-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  freetype-devel
 BuildRequires:  fontconfig-devel
+BuildRequires:  cairo-devel
 BuildRequires:  GraphicsMagick-c++-devel
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 Requires:       vdr-softhddevice
@@ -71,6 +72,9 @@ install -Dpm 644 %{SOURCE1} \
 
 
 %changelog
+* Sat Nov 15 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.5-2
+- added BR cairo-devel
+
 * Sat Nov 15 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.5-1
 - Update to 0.0.5
 
