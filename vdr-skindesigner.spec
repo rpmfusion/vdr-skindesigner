@@ -1,6 +1,6 @@
 Name:           vdr-skindesigner
 Version:        0.0.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
@@ -19,7 +19,6 @@ BuildRequires:  fontconfig-devel
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  cairo-devel
 BuildRequires:  librsvg2-devel
-BuildRequires:  GraphicsMagick-c++-devel
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 Requires:       vdr-softhddevice
 Requires:       vdr-epgsearch
@@ -44,7 +43,7 @@ This package contains icons and xml files.
 %setup -q -n vdr-plugin-skindesigner-%{version}
 
 %build
-make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" IMAGELIB=graphicsmagick %{?_smp_mflags} all
+make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} all
 
 %install
 # make install would install the themes under /etc, let's not use that
@@ -74,6 +73,10 @@ install -Dpm 644 %{SOURCE1} \
 
 
 %changelog
+* Mon Nov 24 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.6-2
+- Rebuild
+- removed BR GraphicsMagick-c++-devel
+
 * Sat Nov 22 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.6-1
 - Update to 0.0.6
 
