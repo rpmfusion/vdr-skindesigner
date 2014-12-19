@@ -1,5 +1,5 @@
 Name:           vdr-skindesigner
-Version:        0.1.0
+Version:        0.1.1
 Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
@@ -73,6 +73,9 @@ install -Dpm 644 %{SOURCE1} \
 
 
 %changelog
+* Fri Dec 19 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.1.1-1
+- Update to 0.1.1
+
 * Sat Dec 06 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.1.0-1
 - Update to 0.1.0
 
