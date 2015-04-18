@@ -1,5 +1,5 @@
 Name:           vdr-skindesigner
-Version:        0.3.4
+Version:        0.4.3
 Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
@@ -39,28 +39,57 @@ Requires:      %{name} = %{version}-%{release}
 %description data
 This package contains icons and xml files.
 
+%package -n libskindesignerapi
+Summary:        Library files for %{name}
+
+%description -n libskindesignerapi
+Library which provides the Skindesigner API to other VDR Plugins.
+VDR Plugins using this API are able to use all Skindesigner
+facilities to display their OSD representation.
+
+%package -n libskindesignerapi-devel
+Summary:        Development files for libskindesignerapi
+Requires:       libskindesignerapi%{?_isa} = %{version}-%{release}
+Requires:       vdr-devel >= 2.0.0
+
+%description -n libskindesignerapi-devel
+Development files for libskindesignerapi.
+
 %prep
 %setup -q -n vdr-plugin-skindesigner-%{version}
+sed -i -e 's|PREFIX ?= /usr/local|PREFIX ?= /usr|g' libskindesignerapi/Makefile
+sed -i -e 's|LIBDIR ?= $(PREFIX)/lib|LIBDIR ?= %{_libdir}/|g' libskindesignerapi/Makefile
+sed -i -e 's|PCDIR  ?= $(PREFIX)/lib/pkgconfig|PCDIR  ?= %{_libdir}/pkgconfig|g' libskindesignerapi/Makefile
+chmod 755 scripts/temperatures.g2v
 
 %build
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} all
 
 %install
 # make install would install the themes under /etc, let's not use that
-make install-lib install-i18n DESTDIR=%{buildroot} INSTALL="install -p"
+make install-subprojects install-lib install-i18n DESTDIR=%{buildroot} INSTALL="install -p"
 # install the themes to the custom location used in Fedora
 install -dm 755 %{buildroot}%{vdr_vardir}/themes
 install -pm 644 themes/*.theme %{buildroot}%{vdr_vardir}/themes/
-
+# install the skins to the custom location used in Fedora
 install -dm 755 %{buildroot}%{vdr_resdir}/plugins/skindesigner/skins
 cp -pR skins/* %{buildroot}%{vdr_resdir}/plugins/skindesigner/skins
+# install the scripts to the custom location used in Fedora
+install -dm 755 %{buildroot}%{vdr_resdir}/plugins/skindesigner/scripts
+cp -pR scripts/* %{buildroot}%{vdr_resdir}/plugins/skindesigner/scripts
 
-# tvguide.conf
+# skindesigner.conf
 install -Dpm 644 %{SOURCE1} \
     %{buildroot}%{_sysconfdir}/sysconfig/vdr-plugins.d/skindesigner.conf
 
+# install missing symlink (was giving no-ldconfig-symlink rpmlint errors)
+ldconfig -n %{buildroot}%{_libdir}
 
 %find_lang %{name}
+
+%post -n libskindesignerapi -p /sbin/ldconfig
+
+%postun -n libskindesignerapi -p /sbin/ldconfig
 
 %files -f %{name}.lang
 %doc HISTORY README
@@ -72,10 +101,32 @@ install -Dpm 644 %{SOURCE1} \
 %files data
 %{vdr_resdir}/plugins/skindesigner/
 
+%files -n libskindesignerapi
+%doc libskindesignerapi/README
+%license libskindesignerapi/COPYING
+%{_libdir}/libskindesignerapi.so.*
+
+%files -n libskindesignerapi-devel
+%{_libdir}/pkgconfig/libskindesignerapi.pc
+%{_libdir}/libskindesignerapi.so
+%dir %{_includedir}/libskindesignerapi/
+%{_includedir}/libskindesignerapi/
 
 %changelog
-* Wed Apr 01 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.3.4-1
-- Update to 0.3.4
+* Sun Apr 12 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.4.3-1
+- Update to 0.4.3
+
+* Wed Apr 08 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.4.2-2
+- corrected /sbin/ldconfig calls in %%post and %%postun
+- corrected unversioned libskindesignerapi.so.* name
+- dropped Requires: pkgconfig from libskindesignerapi-devel
+- dropped unversioned-explicit-provides libskindesignerapi.so.0
+- corrected description for libskindesignerapi-devel package
+- added Requires: libskindesignerapi%%{?_isa} = %%{version}-%%{release}
+
+* Tue Apr 07 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.4.2-1
+- Update to 0.4.2
+- added libskindesignerapi subpackage
 
 * Sat Mar 28 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.3.3-1
 - Update to 0.3.3
