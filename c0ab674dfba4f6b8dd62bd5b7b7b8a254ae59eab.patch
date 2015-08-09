@@ -1,0 +1,85 @@
+From c0ab674dfba4f6b8dd62bd5b7b7b8a254ae59eab Mon Sep 17 00:00:00 2001
+From: louis
+Date: Sun, 09 Aug 2015 07:33:36 +0000
+Subject: fixed compiling fur unpatched VDR
+
+---
+diff --git a/HISTORY b/HISTORY
+index e8811ba..86fc82a 100644
+--- a/HISTORY
++++ b/HISTORY
+@@ -423,3 +423,4 @@ Version 0.6.3
+ 
+ Version 0.7.0
+ 
++- fixed compiling fur unpatched VDR
+diff --git a/displaymenu.h b/displaymenu.h
+index 5aee6d1..6600a9a 100644
+--- a/displaymenu.h
++++ b/displaymenu.h
+@@ -1,8 +1,5 @@
+ #ifndef __DISPLAYMENU_H
+ #define __DISPLAYMENU_H
+-#include "libskindesignerapi/skindesignerapi.h"
+-#include "libtemplate/template.h"
+-#include "views/displaymenurootview.h"
+ 
+ #if defined(APIVERSNUM) && APIVERSNUM < 20301
+ #ifndef MENU_ORIENTATION_DEFINED
+@@ -13,6 +10,10 @@ enum eMenuOrientation {
+ #endif
+ #endif
+ 
++#include "libskindesignerapi/skindesignerapi.h"
++#include "libtemplate/template.h"
++#include "views/displaymenurootview.h"
++
+ enum eViewState {
+     vsInit,
+     vsMenuInit,
+diff --git a/views/displayaudiotracksview.c b/views/displayaudiotracksview.c
+index f2f6a32..a24d331 100644
+--- a/views/displayaudiotracksview.c
++++ b/views/displayaudiotracksview.c
+@@ -1,5 +1,6 @@
+ #define __STL_CONFIG_H
+ #include <vdr/menu.h>
++#include "../displaymenu.h"
+ #include "displayaudiotracksview.h"
+ 
+ cDisplayAudiotracksView::cDisplayAudiotracksView(int numTracks, cTemplateView *tmplView) : cView(tmplView) {
+diff --git a/views/displaymenulistview.c b/views/displaymenulistview.c
+index b96bdc2..7cc08c9 100644
+--- a/views/displaymenulistview.c
++++ b/views/displaymenulistview.c
+@@ -1,4 +1,5 @@
+ #include <vdr/menu.h>
++#include "../displaymenu.h"
+ #include "displaymenulistview.h"
+ 
+ 
+diff --git a/views/displaymenurootview.c b/views/displaymenurootview.c
+index 2d4e457..76d8b86 100644
+--- a/views/displaymenurootview.c
++++ b/views/displaymenurootview.c
+@@ -1,5 +1,6 @@
+ #define __STL_CONFIG_H
+ #include <vdr/menu.h>
++#include "../displaymenu.h"
+ #include "displaymenurootview.h"
+ #include "displayviewelements.h"
+ #include "../config.h"
+diff --git a/views/displaymenuview.c b/views/displaymenuview.c
+index 53ab558..d5abe7d 100644
+--- a/views/displaymenuview.c
++++ b/views/displaymenuview.c
+@@ -1,6 +1,7 @@
+ #define __STL_CONFIG_H
+ #include <vdr/menu.h>
+ #include <vdr/videodir.h>
++#include "../displaymenu.h"
+ #include "displaymenuview.h"
+ #include "displayviewelements.h"
+ #include "../config.h"
+--
+cgit v0.9.0.2-40-g7c79
