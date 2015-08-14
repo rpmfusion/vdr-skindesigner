@@ -1,5 +1,5 @@
 Name:           vdr-skindesigner
-Version:        0.7.0
+Version:        0.7.1
 Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
@@ -9,8 +9,6 @@ URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-skindesigner.git/snapshot/vdr-plugin-skindesigner-%{version}.tar.bz2
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
-# fixed compiling for unpatched VDR
-Patch0:         c0ab674dfba4f6b8dd62bd5b7b7b8a254ae59eab.patch
 
 BuildRequires:  vdr-devel >= 2.0.0
 BuildRequires:  gettext
@@ -64,8 +62,6 @@ sed -i -e 's|LIBDIR ?= $(PREFIX)/lib|LIBDIR ?= %{_libdir}/|g' libskindesignerapi
 sed -i -e 's|PCDIR  ?= $(PREFIX)/lib/pkgconfig|PCDIR  ?= %{_libdir}/pkgconfig|g' libskindesignerapi/Makefile
 chmod 755 scripts/temperatures.g2v
 
-%patch0 -p1
-
 %build
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} all
 
@@ -117,6 +113,9 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/
 
 %changelog
+* Fri Aug 14 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.7.1-1
+- Update to 0.7.1
+
 * Sun Aug 09 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.7.0-1
 - Update to 0.7.0
 - added Patch that fixed compiling for unpatched VDR
