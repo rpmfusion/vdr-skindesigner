@@ -1,5 +1,6 @@
 Name:           vdr-skindesigner
-Version:        0.7.2
+Version:        0.8.0
+#Version:        0.7.2
 Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
@@ -9,6 +10,7 @@ URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-skindesigner.git/snapshot/vdr-plugin-skindesigner-%{version}.tar.bz2
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
+Patch0:         %{name}-0.8.0-makefile.patch
 
 BuildRequires:  vdr-devel >= 2.0.0
 BuildRequires:  gettext
@@ -57,10 +59,16 @@ Development files for libskindesignerapi.
 
 %prep
 %setup -q -n vdr-plugin-skindesigner-%{version}
+%patch0 -p1
 sed -i -e 's|PREFIX ?= /usr/local|PREFIX ?= /usr|g' libskindesignerapi/Makefile
 sed -i -e 's|LIBDIR ?= $(PREFIX)/lib|LIBDIR ?= %{_libdir}/|g' libskindesignerapi/Makefile
 sed -i -e 's|PCDIR  ?= $(PREFIX)/lib/pkgconfig|PCDIR  ?= %{_libdir}/pkgconfig|g' libskindesignerapi/Makefile
 chmod 755 scripts/temperatures.g2v
+
+# header file skindesignerapi.h was not found
+sed -i -e 's|#include "libskindesignerapi/skindesignerapi.h"|#include "../libskindesignerapi/skindesignerapi.h"|g' extensions/pluginmanager.h
+# std::auto_ptr deprecation warning in libstdc++ 5.1
+sed -i -e 's|      std::auto_ptr<cServiceHandler> handler;|       std::unique_ptr<cServiceHandler> handler;|g' services/epgsearch.h
 
 %build
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} all
@@ -113,6 +121,9 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/
 
 %changelog
+* Sun Jan 31 2016 Martin Gansser <martinkg@fedoraproject.org> - 0.8.0-1
+- Update to 0.8.0
+
 * Fri Aug 14 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.7.2-1
 - Update to 0.7.2
 
