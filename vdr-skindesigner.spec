@@ -1,5 +1,5 @@
 Name:           vdr-skindesigner
-Version:        0.8.3
+Version:        0.8.4
 Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
@@ -24,10 +24,10 @@ Requires:       vdr-softhddevice
 Requires:       vdr-epgsearch
 
 %description
-SkinDesigner is a powerfull tool to create VDR Skins based on Skindesigner
+SkinDesigner is a powerful tool to create VDR Skins based on Skindesigner
 specific XML Code. The following documentation shows the SkinDesigner
 "internals" so that new Skinners get easily an overview how Skindesigner works.
-Hopefully all your open questions are answerd, if not, feel free to ask in
+Hopefully all your open questions are answered, if not, feel free to ask in
 VDR Portal.
 
 %package data
@@ -60,7 +60,9 @@ Development files for libskindesignerapi.
 sed -i -e 's|PREFIX ?= /usr/local|PREFIX ?= /usr|g' libskindesignerapi/Makefile
 sed -i -e 's|LIBDIR ?= $(PREFIX)/lib|LIBDIR ?= %{_libdir}/|g' libskindesignerapi/Makefile
 sed -i -e 's|PCDIR  ?= $(PREFIX)/lib/pkgconfig|PCDIR  ?= %{_libdir}/pkgconfig|g' libskindesignerapi/Makefile
-chmod 755 scripts/temperatures.g2v
+
+# changed permission due rpmlint warning E: non-executable-script
+chmod a+x scripts/{temperatures.g2v,vdrstats.default}
 
 %build
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} all
@@ -109,10 +111,14 @@ ldconfig -n %{buildroot}%{_libdir}
 %files -n libskindesignerapi-devel
 %{_libdir}/pkgconfig/libskindesignerapi.pc
 %{_libdir}/libskindesignerapi.so
-%dir %{_includedir}/libskindesignerapi/
-%{_includedir}/libskindesignerapi/
+%dir %{_includedir}/libskindesignerapi
+%{_includedir}/libskindesignerapi/*
 
 %changelog
+* Sat Feb 13 2016 Martin Gansser <martinkg@fedoraproject.org> - 0.8.4-1
+- Update to 0.8.4
+- Corrected spelling-error
+
 * Wed Feb 10 2016 Martin Gansser <martinkg@fedoraproject.org> - 0.8.3-1
 - Update to 0.8.3
 
