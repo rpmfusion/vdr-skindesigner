@@ -1,6 +1,6 @@
 Name:           vdr-skindesigner
 Version:        1.2.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
@@ -10,6 +10,7 @@ Source0:        http://projects.vdr-developer.org/git/vdr-plugin-skindesigner.gi
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
 
+BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 2.0.0
 BuildRequires:  gettext
 BuildRequires:  libcurl-devel
@@ -116,6 +117,9 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Thu Oct 11 2018 Martin Gansser <martinkg@fedoraproject.org> - 1.2.7-5
+- Add BR gcc-c++
+
 * Sun Aug 19 2018 Leigh Scott <leigh123linux@googlemail.com> - 1.2.7-4
 - Rebuilt for Fedora 29 Mass Rebuild binutils issue
 
