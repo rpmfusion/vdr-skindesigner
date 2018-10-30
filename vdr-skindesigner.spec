@@ -1,6 +1,6 @@
 Name:           vdr-skindesigner
 Version:        1.2.7
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
@@ -78,6 +78,9 @@ install -pm 644 themes/*.theme %{buildroot}%{vdr_vardir}/themes/
 # install the skins to the custom location used in Fedora
 install -dm 755 %{buildroot}%{vdr_resdir}/plugins/skindesigner/skins
 cp -pR skins/* %{buildroot}%{vdr_resdir}/plugins/skindesigner/skins
+# install the dtd to the custom location used in Fedora
+install -dm 755 %{buildroot}%{vdr_resdir}/plugins/skindesigner/dtd
+cp -pR dtd/* %{buildroot}%{vdr_resdir}/plugins/skindesigner/dtd
 # install the scripts to the custom location used in Fedora
 install -dm 755 %{buildroot}%{vdr_resdir}/plugins/skindesigner/scripts
 cp -pR scripts/* %{buildroot}%{vdr_resdir}/plugins/skindesigner/scripts
@@ -117,6 +120,9 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Tue Oct 30 2018 Martin Gansser <martinkg@fedoraproject.org> - 1.2.7-6
+- Add dtd setup files
+
 * Thu Oct 11 2018 Martin Gansser <martinkg@fedoraproject.org> - 1.2.7-5
 - Add BR gcc-c++
 
