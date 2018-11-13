@@ -1,6 +1,8 @@
+%global sname   skindesigner
+
 Name:           vdr-skindesigner
 Version:        1.2.7
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
@@ -76,18 +78,20 @@ make install-subprojects install-lib install-i18n DESTDIR=%{buildroot} INSTALL="
 install -dm 755 %{buildroot}%{vdr_vardir}/themes
 install -pm 644 themes/*.theme %{buildroot}%{vdr_vardir}/themes/
 # install the skins to the custom location used in Fedora
-install -dm 755 %{buildroot}%{vdr_resdir}/plugins/skindesigner/skins
-cp -pR skins/* %{buildroot}%{vdr_resdir}/plugins/skindesigner/skins
+install -dm 755 %{buildroot}%{vdr_resdir}/plugins/%{sname}/skins
+cp -pR skins/* %{buildroot}%{vdr_resdir}/plugins/%{sname}/skins
 # install the dtd to the custom location used in Fedora
-install -dm 755 %{buildroot}%{vdr_resdir}/plugins/skindesigner/dtd
-cp -pR dtd/* %{buildroot}%{vdr_resdir}/plugins/skindesigner/dtd
+install -dm 755 %{buildroot}%{vdr_resdir}/plugins/%{sname}/dtd
+cp -pR dtd/* %{buildroot}%{vdr_resdir}/plugins/%{sname}/dtd
 # install the scripts to the custom location used in Fedora
-install -dm 755 %{buildroot}%{vdr_resdir}/plugins/skindesigner/scripts
-cp -pR scripts/* %{buildroot}%{vdr_resdir}/plugins/skindesigner/scripts
+install -dm 755 %{buildroot}%{vdr_resdir}/plugins/%{sname}/scripts
+cp -pR scripts/* %{buildroot}%{vdr_resdir}/plugins/%{sname}/scripts
+# create path where XML skins are installed by the Skindesigner Installer
+install -dm 755 %{buildroot}%{vdr_resdir}/plugins/%{sname}/installerskins/
 
 # skindesigner.conf
 install -Dpm 644 %{SOURCE1} \
-    %{buildroot}%{_sysconfdir}/sysconfig/vdr-plugins.d/skindesigner.conf
+    %{buildroot}%{_sysconfdir}/sysconfig/vdr-plugins.d/%{sname}.conf
 
 # install missing symlink (was giving no-ldconfig-symlink rpmlint errors)
 ldconfig -n %{buildroot}%{_libdir}
@@ -101,12 +105,12 @@ ldconfig -n %{buildroot}%{_libdir}
 %files -f %{name}.lang
 %doc HISTORY README
 %license COPYING
-%config(noreplace) %{_sysconfdir}/sysconfig/vdr-plugins.d/skindesigner.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/vdr-plugins.d/%{sname}.conf
 %{vdr_plugindir}/libvdr-*.so.%{vdr_apiversion}
 %{vdr_vardir}/themes/*.theme
 
 %files data
-%{vdr_resdir}/plugins/skindesigner/
+%{vdr_resdir}/plugins/%{sname}/
 
 %files -n libskindesignerapi
 %doc libskindesignerapi/README
@@ -120,6 +124,9 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Tue Nov 13 2018 Martin Gansser <martinkg@fedoraproject.org> - 1.2.7-7
+- Create path where XML skins are installed by the Skindesigner Installer
+
 * Tue Oct 30 2018 Martin Gansser <martinkg@fedoraproject.org> - 1.2.7-6
 - Add dtd setup files
 
