@@ -2,7 +2,7 @@
 
 Name:           vdr-skindesigner
 Version:        1.2.7
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 
 Group:          Applications/Multimedia
@@ -124,6 +124,9 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Tue Mar 05 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.2.7-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
 * Tue Nov 13 2018 Martin Gansser <martinkg@fedoraproject.org> - 1.2.7-7
 - Create path where XML skins are installed by the Skindesigner Installer
 
