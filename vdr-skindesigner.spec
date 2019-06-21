@@ -2,15 +2,15 @@
 
 Name:           vdr-skindesigner
 Version:        1.2.7
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
-
-Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-skindesigner.git/snapshot/vdr-plugin-skindesigner-%{version}.tar.bz2
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
+# fix invalid lock sequence report  https://www.vdr-portal.de/index.php?attachment/42652-skindesigner-diff-gz
+Patch0:         skindesigner.diff.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 2.0.0
@@ -59,7 +59,7 @@ Requires:       vdr-devel >= 2.0.0
 Development files for libskindesignerapi.
 
 %prep
-%setup -q -n vdr-plugin-skindesigner-%{version}
+%autosetup -p 1 -n vdr-plugin-skindesigner-%{version}
 
 sed -i -e 's|PREFIX ?= /usr/local|PREFIX ?= /usr|g' libskindesignerapi/Makefile
 sed -i -e 's|LIBDIR ?= $(PREFIX)/lib|LIBDIR ?= %{_libdir}/|g' libskindesignerapi/Makefile
@@ -124,6 +124,10 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Tue Jun 18 2019 Martin Gansser <martinkg@fedoraproject.org> - 1.2.7-9
+- Rebuilt for new VDR API version
+- Add skindesigner.diff.gz to fix invalid lock sequence report
+
 * Tue Mar 05 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.2.7-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
