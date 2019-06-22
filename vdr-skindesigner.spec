@@ -1,16 +1,14 @@
 %global sname   skindesigner
 
 Name:           vdr-skindesigner
-Version:        1.2.7
-Release:        9%{?dist}
+Version:        1.2.8
+Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-skindesigner.git/snapshot/vdr-plugin-skindesigner-%{version}.tar.bz2
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
-# fix invalid lock sequence report  https://www.vdr-portal.de/index.php?attachment/42652-skindesigner-diff-gz
-Patch0:         skindesigner.diff.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 2.0.0
@@ -124,6 +122,10 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Sat Jun 22 2019 Martin Gansser <martinkg@fedoraproject.org> - 1.2.8-1
+- Update to 1.2.8
+- Dropped skindesigner.diff.gz
+
 * Tue Jun 18 2019 Martin Gansser <martinkg@fedoraproject.org> - 1.2.7-9
 - Rebuilt for new VDR API version
 - Add skindesigner.diff.gz to fix invalid lock sequence report
