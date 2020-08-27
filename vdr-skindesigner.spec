@@ -2,7 +2,7 @@
 
 Name:           vdr-skindesigner
 Version:        1.2.8.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
@@ -67,7 +67,8 @@ sed -i -e 's|PCDIR  ?= $(PREFIX)/lib/pkgconfig|PCDIR  ?= %{_libdir}/pkgconfig|g'
 chmod a+x scripts/{temperatures.g2v,vdrstats.default}
 
 %build
-make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} all
+%{set_build_flags}
+%make_build
 
 %install
 # make install would install the themes under /etc, let's not use that
@@ -122,6 +123,9 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Thu Aug 27 2020 Martin Gansser <martinkg@fedoraproject.org> - 1.2.8.4-3
+- Rebuilt for new VDR API version
+
 * Tue Aug 18 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.2.8.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
