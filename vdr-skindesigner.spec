@@ -1,8 +1,8 @@
 %global sname   skindesigner
 
 Name:           vdr-skindesigner
-Version:        1.2.8.4
-Release:        3%{?dist}
+Version:        1.2.8.5
+Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
@@ -123,6 +123,9 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Thu Sep 24 2020 Martin Gansser <martinkg@fedoraproject.org> - 1.2.8.5-1
+- Update to 1.2.8.5
+
 * Thu Aug 27 2020 Martin Gansser <martinkg@fedoraproject.org> - 1.2.8.4-3
 - Rebuilt for new VDR API version
 
