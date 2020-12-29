@@ -2,7 +2,7 @@
 
 Name:           vdr-skindesigner
 Version:        1.2.8.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
@@ -95,6 +95,10 @@ install -Dpm 644 %{SOURCE1} \
 # install missing symlink (was giving no-ldconfig-symlink rpmlint errors)
 ldconfig -n %{buildroot}%{_libdir}
 
+#
+mkdir -p %{buildroot}/etc/vdr/plugins/skindesigner/
+ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugins/skindesigner/
+
 %find_lang %{name}
 
 %post -n libskindesignerapi -p /sbin/ldconfig
@@ -106,10 +110,19 @@ ldconfig -n %{buildroot}%{_libdir}
 %license COPYING
 %config(noreplace) %{_sysconfdir}/sysconfig/vdr-plugins.d/%{sname}.conf
 %{vdr_plugindir}/libvdr-*.so.%{vdr_apiversion}
-%{vdr_vardir}/themes/*.theme
+%dir %{vdr_resdir}/plugins/%{sname}/dtd
+%{vdr_resdir}/plugins/%{sname}/dtd
+%dir %{vdr_resdir}/plugins/%{sname}/scripts
+%{vdr_resdir}/plugins/%{sname}/scripts
+%{vdr_configdir}/plugins/skindesigner/dtd
+# to be able to install skin repos without the data package
+%dir %{vdr_resdir}/plugins/%{sname}/
+%dir %{vdr_resdir}/plugins/%{sname}/installerskins/
 
 %files data
-%{vdr_resdir}/plugins/%{sname}/
+%dir %{vdr_resdir}/plugins/%{sname}/skins
+%{vdr_resdir}/plugins/%{sname}/skins
+%{vdr_vardir}/themes/*.theme
 
 %files -n libskindesignerapi
 %doc libskindesignerapi/README
@@ -123,6 +136,13 @@ ldconfig -n %{buildroot}%{_libdir}
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Tue Dec 29 2020 Martin Gansser <martinkg@fedoraproject.org> - 1.2.8.6-2
+- Move dtd and script files into base package
+- Create softlink dtd files are expected in /etc/vdr/plugins/skindesigner
+- Move themes into data package
+- Move the two "builtin" skins into vdr-skindesigner-data
+- fixes (rfbz#5881)
+
 * Thu Dec 17 2020 Martin Gansser <martinkg@fedoraproject.org> - 1.2.8.6-1
 - Update to 1.2.8.6
 
