@@ -1,8 +1,10 @@
 %global sname   skindesigner
+# version we want build against
+%global vdr_version 2.6.1
 
 Name:           vdr-skindesigner
 Version:        1.2.18
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
@@ -11,7 +13,7 @@ Source0:        http://projects.vdr-developer.org/git/vdr-plugin-skindesigner.gi
 Source1:        %{name}.conf
 
 BuildRequires:  gcc-c++
-BuildRequires:  vdr-devel >= 2.0.0
+BuildRequires:  vdr-devel >= %{vdr_version}
 BuildRequires:  gettext
 BuildRequires:  libcurl-devel
 BuildRequires:  libxml2-devel
@@ -136,6 +138,9 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Mon Apr 11 2022 Sérgio Basto <sergio@serjux.com> - 1.2.18-2
+- Rebuilt for VDR 2.6.1
+
 * Fri Feb 11 2022 Martin Gansser <martinkg@fedoraproject.org> - 1.2.18-1
 - Update to 1.2.18
 
