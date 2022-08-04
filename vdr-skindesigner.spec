@@ -1,14 +1,20 @@
 %global sname   skindesigner
 # version we want build against
+%global vdr_version 2.4.0
+%if 0%{?fedora} >= 36
 %global vdr_version 2.6.1
+%endif
+%if 0%{?fedora} == 35
+%global vdr_version 2.4.7
+%endif
 
 Name:           vdr-skindesigner
 Version:        1.2.18
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPLv2+
-URL:            http://projects.vdr-developer.org/projects/plg-skindesigner
-Source0:        http://projects.vdr-developer.org/git/vdr-plugin-skindesigner.git/snapshot/vdr-plugin-skindesigner-%{version}.tar.bz2
+URL:            https://gitlab.com/kamel5/skindesigner
+Source0:        %url/-/archive/%{version}/%{sname}-%{version}.tar.bz2
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
 
@@ -59,7 +65,7 @@ Requires:       vdr-devel >= 2.0.0
 Development files for libskindesignerapi.
 
 %prep
-%autosetup -p 1 -n vdr-plugin-skindesigner-%{version}
+%autosetup -p 1 -n skindesigner-%{version}
 
 sed -i -e 's|PREFIX ?= /usr/local|PREFIX ?= /usr|g' libskindesignerapi/Makefile
 sed -i -e 's|LIBDIR ?= $(PREFIX)/lib|LIBDIR ?= %{_libdir}/|g' libskindesignerapi/Makefile
@@ -113,9 +119,9 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %config(noreplace) %{_sysconfdir}/sysconfig/vdr-plugins.d/%{sname}.conf
 %{vdr_plugindir}/libvdr-*.so.%{vdr_apiversion}
 %dir %{vdr_resdir}/plugins/%{sname}/dtd
-%{vdr_resdir}/plugins/%{sname}/dtd
+%{vdr_resdir}/plugins/%{sname}/dtd/*
 %dir %{vdr_resdir}/plugins/%{sname}/scripts
-%{vdr_resdir}/plugins/%{sname}/scripts
+%{vdr_resdir}/plugins/%{sname}/scripts/*
 %{vdr_configdir}/plugins/skindesigner/dtd
 # to be able to install skin repos without the data package
 %dir %{vdr_resdir}/plugins/%{sname}/
@@ -123,7 +129,7 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 
 %files data
 %dir %{vdr_resdir}/plugins/%{sname}/skins
-%{vdr_resdir}/plugins/%{sname}/skins
+%{vdr_resdir}/plugins/%{sname}/skins/*
 %{vdr_vardir}/themes/*.theme
 
 %files -n libskindesignerapi
@@ -138,6 +144,9 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Thu Aug 04 2022 Martin Gansser <martinkg@fedoraproject.org> - 1.2.18-3
+- Update to new github address
+
 * Mon Apr 11 2022 Sérgio Basto <sergio@serjux.com> - 1.2.18-2
 - Rebuilt for VDR 2.6.1
 
