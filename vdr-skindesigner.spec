@@ -9,8 +9,8 @@
 %endif
 
 Name:           vdr-skindesigner
-Version:        1.2.18
-Release:        4%{?dist}
+Version:        1.2.19
+Release:        1%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPLv2+
 URL:            https://gitlab.com/kamel5/skindesigner
@@ -144,6 +144,9 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Thu Nov 10 2022 Martin Gansser <martinkg@fedoraproject.org> - 1.2.19-1
+- Update to 1.2.19
+
 * Mon Aug 08 2022 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.2.18-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild and ffmpeg
   5.1
