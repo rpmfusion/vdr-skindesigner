@@ -17,6 +17,7 @@ URL:            https://gitlab.com/kamel5/skindesigner
 Source0:        %url/-/archive/%{version}/%{sname}-%{version}.tar.bz2
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
+Patch0:         Add-missing-algorithm-include-for-std-min.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= %{vdr_version}
@@ -146,6 +147,7 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %changelog
 * Thu Nov 10 2022 Martin Gansser <martinkg@fedoraproject.org> - 1.2.19-1
 - Update to 1.2.19
+- Add missing algorithm include for std::min_element
 
 * Mon Aug 08 2022 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.2.18-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild and ffmpeg
