@@ -1,16 +1,13 @@
 %global sname   skindesigner
 # version we want build against
-%global vdr_version 2.4.0
-%if 0%{?fedora} >= 36
 %global vdr_version 2.6.1
-%endif
-%if 0%{?fedora} == 35
-%global vdr_version 2.4.7
+%if 0%{?fedora} >= 38
+%global vdr_version 2.6.2
 %endif
 
 Name:           vdr-skindesigner
 Version:        1.2.19
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPLv2+
 URL:            https://gitlab.com/kamel5/skindesigner
@@ -145,6 +142,9 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Sat Dec 03 2022 Martin Gansser <martinkg@fedoraproject.org> - 1.2.19-2
+- Rebuilt for new VDR API version
+
 * Thu Nov 10 2022 Martin Gansser <martinkg@fedoraproject.org> - 1.2.19-1
 - Update to 1.2.19
 - Add missing algorithm include for std::min_element
