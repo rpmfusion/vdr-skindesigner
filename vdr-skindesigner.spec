@@ -6,13 +6,13 @@
 # version we want build against
 %global vdr_version 2.6.3
 %if 0%{?fedora} >= 40
-%global vdr_version 2.6.6
+%global vdr_version 2.6.7
 %endif
 
 Name:           vdr-skindesigner
 Version:        2.12
 # Release:        1%%{?dist}
-Release:        0.3.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        0.4.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPLv2+
 URL:            https://gitlab.com/kamel5/skindesigner
@@ -148,6 +148,9 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Sun Apr 21 2024 Martin Gansser <martinkg@fedoraproject.org> - 2.12-0.4.20240104git71b3e51
+- Rebuilt for new VDR API version
+
 * Sun Feb 04 2024 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 2.12-0.3.20240104git71b3e51
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
