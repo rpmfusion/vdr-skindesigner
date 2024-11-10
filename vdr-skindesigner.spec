@@ -13,8 +13,8 @@
 %endif
 
 Name:           vdr-skindesigner
-Version:        1.2.23
-Release:        2%{?dist}
+Version:        1.2.24
+Release:        1%{?dist}
 # Release:        0.6.%%{gitdate}git%%{shortcommit0}%%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPL-2.0-or-later
@@ -24,7 +24,6 @@ Source0:        %url/-/archive/%{version}/%{sname}-%{version}.tar.bz2
 # Source0:        %%url/-/archive/%%{commit0}/%%{name}-%%{shortcommit0}.tar.gz
 # Configuration files for plugin parameters. These are Fedora specific and not in upstream.
 Source1:        %{name}.conf
-Patch0:         Add-missing-algorithm-include-for-std-min.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= %{vdr_version}
@@ -73,7 +72,7 @@ Requires:       vdr-devel >= 2.0.0
 Development files for libskindesignerapi.
 
 %prep
-%autosetup -p 1 -n skindesigner-%{version}
+%autosetup -p1 -n skindesigner-%{version}
 
 sed -i -e 's|PREFIX ?= /usr/local|PREFIX ?= /usr|g' libskindesignerapi/Makefile
 sed -i -e 's|LIBDIR ?= $(PREFIX)/lib|LIBDIR ?= %{_libdir}/|g' libskindesignerapi/Makefile
@@ -152,6 +151,9 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Sun Nov 10 2024 Martin Gansser <martinkg@fedoraproject.org> - 1:1.2.24-1
+- Update to 1:1.2.24
+
 * Mon Oct 21 2024 Martin Gansser <martinkg@fedoraproject.org> - 1:1.2.23-2
 - Rebuilt for new VDR API version 2.7.3
 

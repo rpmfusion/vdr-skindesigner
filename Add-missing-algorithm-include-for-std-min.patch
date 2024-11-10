@@ -1,8 +1,0 @@
---- a/coreengine/osdwrapper.c.orig	2022-11-10 08:48:42.365040323 +0100
-+++ b/coreengine/osdwrapper.c	2022-11-10 08:52:00.757971364 +0100
-@@ -1,4 +1,5 @@
- #include "osdwrapper.h"
-+#include <algorithm>
-
- cSdOsd::cSdOsd(void) {
-     osd = NULL;
