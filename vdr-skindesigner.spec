@@ -5,17 +5,20 @@
 %global gitdate 20240104
 
 # Set vdr_version based on Fedora version
-%if 0%{?fedora} >= 43
-%global vdr_version 2.7.7
-%elif 0%{?fedora} == 42
-%global vdr_version 2.7.4
-%else
+# Default
 %global vdr_version 2.6.9
+
+%if 0%{?fedora} == 42
+%global vdr_version 2.7.4
+%elif 0%{?fedora} == 43
+%global vdr_version 2.7.7
+%elif 0%{?fedora} >= 44
+%global vdr_version 2.7.8
 %endif
 
 Name:           vdr-skindesigner
 Version:        1.2.26
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Release:        0.6.%%{gitdate}git%%{shortcommit0}%%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPL-2.0-or-later
@@ -152,6 +155,9 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Tue Feb 03 2026 Martin Gansser <martinkg@fedoraproject.org> - 1:1.2.26-3
+- Rebuilt for new VDR API version 2.7.8
+
 * Mon Feb 02 2026 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1:1.2.26-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
