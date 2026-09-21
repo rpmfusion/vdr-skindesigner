@@ -1,47 +1,42 @@
 %global sname   skindesigner
-# https://gitlab.com/kamel5/skindesigner/-/archive/71b3e514c6c7f8eb76751ce04f1e3dd8f3037b25
-%global commit0 71b3e514c6c7f8eb76751ce04f1e3dd8f3037b25
-%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global gitdate 20240104
-
-# Set vdr_version based on Fedora version
-# Default
-%global vdr_version 2.7.7
-
-%if 0%{?fedora} == 43
-%global vdr_version 2.7.7
-%elif 0%{?fedora} == 44
-%global vdr_version 2.8.1
-%elif 0%{?fedora} > 44
-%global vdr_version 2.8.2
-%endif
+# The plugin ABI is expressed through vdr(abi); don't export private .so provides.
+%global __provides_exclude_from ^%{vdr_libdir}/.*\\.so.*$
 
 Name:           vdr-skindesigner
 Version:        1.3.0
-Release:        3%{?dist}
-# Release:        0.6.%%{gitdate}git%%{shortcommit0}%%{?dist}
+Release:        4%{?dist}
 Summary:        A VDR skinning engine that displays XML based Skins
 License:        GPL-2.0-or-later
 Epoch:          1
 URL:            https://gitlab.com/kamel5/skindesigner
-Source0:        %url/-/archive/%{version}/%{sname}-%{version}.tar.bz2
-# Source0:        %%url/-/archive/%%{commit0}/%%{name}-%%{shortcommit0}.tar.gz
-# Configuration files for plugin parameters. These are Fedora specific and not in upstream.
+Source0:        %{url}/-/archive/%{version}/%{sname}-%{version}.tar.bz2
+# Plugin parameters passed by runvdr. Fedora specific, not in upstream.
 Source1:        %{name}.conf
+# For upstream: replace the FSF's stale postal address in COPYING with the
+# license URLs; rpmlint rejects the old address.
+Patch0:         %{name}-fsf-address.patch
+# For upstream: default the channel logo path to VDR's shared <resdir>/logos
+# instead of a plugin private directory the plugin never installs.
+Patch1:         %{name}-logopath.patch
 
 BuildRequires:  gcc-c++
-BuildRequires:  vdr-devel >= %{vdr_version}
+BuildRequires:  make
 BuildRequires:  gettext
-BuildRequires:  libcurl-devel
-BuildRequires:  libxml2-devel
-BuildRequires:  freetype-devel
-BuildRequires:  fontconfig-devel
+BuildRequires:  pkgconfig(libcurl)
+BuildRequires:  pkgconfig(libxml-2.0)
+BuildRequires:  pkgconfig(freetype2)
+BuildRequires:  pkgconfig(fontconfig)
+BuildRequires:  pkgconfig(cairo)
+BuildRequires:  pkgconfig(librsvg-2.0)
 BuildRequires:  libjpeg-turbo-devel
-BuildRequires:  cairo-devel
-BuildRequires:  librsvg2-devel
+BuildRequires:  vdr-devel
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
-Requires:       vdr-softhddevice
-Requires:       vdr-epgsearch
+# Channel logos are optional artwork read from <resdir>/logos at runtime.
+Recommends:     vdr-channellogos
+# Timer conflict info is pulled through VDR's service API behind a
+# GetPlugin("epgsearch") null check, exactly like the epg2vdr and
+# remotetimers integrations that were never hard requirements either.
+Recommends:     vdr-epgsearch
 
 %description
 SkinDesigner is a powerful tool to create VDR Skins based on Skindesigner
@@ -70,7 +65,7 @@ facilities to display their OSD representation.
 %package -n libskindesignerapi-devel
 Summary:        Development files for libskindesignerapi
 Requires:       libskindesignerapi%{?_isa} = %{epoch}:%{version}-%{release}
-Requires:       vdr-devel >= 2.0.0
+Requires:       vdr-devel
 
 %description -n libskindesignerapi-devel
 Development files for libskindesignerapi.
@@ -124,11 +119,19 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 
 %postun -n libskindesignerapi -p /sbin/ldconfig
 
+%check
+# vdr resolves VDRPluginCreator after dlopen; a plugin without that export
+# is broken even if it links cleanly
+nm -D --defined-only %{buildroot}%{vdr_libdir}/libvdr-%{sname}.so.%{vdr_apiversion} | grep -q ' VDRPluginCreator$'
+# the compiled-in default logo path must be the shared one vdr-channellogos fills
+strings %{buildroot}%{vdr_libdir}/libvdr-%{sname}.so.%{vdr_apiversion} \
+  | grep -qx '%{vdr_resdir}/logos'
+
 %files -f %{name}.lang
 %doc HISTORY README
 %license COPYING
 %config(noreplace) %{_sysconfdir}/sysconfig/vdr-plugins.d/%{sname}.conf
-%{vdr_plugindir}/libvdr-*.so.%{vdr_apiversion}
+%{vdr_libdir}/libvdr-*.so.%{vdr_apiversion}
 %dir %{vdr_resdir}/plugins/%{sname}/dtd
 %{vdr_resdir}/plugins/%{sname}/dtd/*
 %dir %{vdr_resdir}/plugins/%{sname}/scripts
@@ -155,6 +158,24 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 %{_includedir}/libskindesignerapi/*
 
 %changelog
+* Thu Aug 20 2026 Dirk Nehring <dnehring@gmx.net> - 1:1.3.0-4
+- Default the compiled-in logo path to the shared, skin-independent
+  /usr/share/vdr/logos instead of a plugin private directory that is never
+  installed; -l/--logopath is no longer needed in the sysconfig snippet
+- Recommend vdr-channellogos, which installs artwork into that directory
+- Demote vdr-epgsearch to a weak dependency: it is reached through VDR's
+  service API behind a GetPlugin() null check, like epg2vdr and
+  remotetimers, which were never hard requirements
+- Drop the hard requirement on vdr-softhddevice; the only mention of it in
+  the source is a comment, and it forced one particular output device on
+  every install
+- Add fsf-address patch for COPYING (for upstream)
+- Modernize spec: drop the per-Fedora vdr_version table and the commented
+  out git snapshot scaffolding, filter the private .so provides, use
+  pkgconfig() build dependencies, add %%check for the plugin entry point
+  and the default logo path
+- Fix the sysconfig snippet, which described the tvguide plugin
+
 * Sun Aug 02 2026 RPM Fusion Release Engineering <leigh123linux@rpmfusion.org> - 1:1.3.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
 
@@ -637,4 +658,3 @@ ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugi
 
 * Sat Oct 04 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.0.1-1.20141004gite688ad96
 - Initial build
-

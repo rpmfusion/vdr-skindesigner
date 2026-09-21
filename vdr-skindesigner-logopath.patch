@@ -1,0 +1,53 @@
+Default the channel logo path to VDR's shared logo directory.
+
+Channel logos are skin independent artwork; other skins read them from
+<resdir>/logos, and distributions ship them there as a separate package.
+skindesigner defaulted to <resdir>/plugins/skindesigner/logos instead, a
+directory the plugin never installs, so out of the box the default path
+pointed at nothing and every setup had to pass -l/--logopath.
+
+Derive the default from vdr.pc like SKINDESIGNER_SCRIPTDIR does, so it
+follows a relocated resdir. -l/--logopath still overrides it, and a skin
+that ships its own themes/<theme>/logos still wins (see imagecache.c).
+
+The trailing slash is kept: FileExists(path, name, ext) concatenates the
+three without a separator.
+
+--- a/Makefile	2026-08-20 01:15:11.717757004 +0200
++++ b/Makefile	2026-08-20 01:15:19.924880323 +0200
+@@ -21,9 +21,13 @@
+ LOCDIR = $(call PKGCFG,locdir)
+ PLGCFG  = $(call PKGCFG,plgcfg)
+ VDRCONFDIR = $(call PKGCFG,configdir)
+-PLGRESDIR = $(call PKGCFG,resdir)/plugins/$(PLUGIN)
++VDRRESDIR = $(call PKGCFG,resdir)
++PLGRESDIR = $(VDRRESDIR)/plugins/$(PLUGIN)
+ TMPDIR ?= /tmp
+ SKINDESIGNER_SCRIPTDIR ?= $(LIBDIR)/$(PLUGIN)/scripts
++# Channel logos are skin independent, so they live in VDR's shared resource
++# directory rather than below this plugin's own resource directory.
++SKINDESIGNER_LOGODIR ?= $(VDRRESDIR)/logos
+ 
+ ### The compiler options:
+ export CFLAGS   = $(call PKGCFG,cflags)
+@@ -47,6 +51,7 @@
+ DEFINES += -DPLUGIN_NAME_I18N='"$(PLUGIN)"' $(CONFIG)
+ DEFINES += $(shell xml2-config --cflags)
+ DEFINES += -DSCRIPTFOLDER='"$(SKINDESIGNER_SCRIPTDIR)"'
++DEFINES += -DLOGOFOLDER='"$(SKINDESIGNER_LOGODIR)"'
+ DEFINES += -D__STL_CONFIG_H
+ 
+ INCLUDES += $(shell pkg-config --cflags freetype2 fontconfig)
+--- a/config.c	2026-08-20 01:15:11.717779541 +0200
++++ b/config.c	2026-08-20 01:15:22.294918114 +0200
+@@ -44,8 +44,8 @@
+         skinPath = cString::sprintf("%s/skins/", cPlugin::ResourceDirectory(PLUGIN_NAME_I18N));
+     if (!installerSkinPathSet)
+         installerSkinPath = cString::sprintf("%s/installerskins/", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
+-    if (!logoPathSet) 
+-        logoPath = cString::sprintf("%s/logos/", cPlugin::ResourceDirectory(PLUGIN_NAME_I18N));
++    if (!logoPathSet)
++        logoPath = cString::sprintf("%s/", LOGOFOLDER);
+     if (!epgImagePathSet)
+         epgImagePath = cString::sprintf("%s/epgimages/", cPlugin::CacheDirectory(PLUGIN_NAME_I18N));
+     if (!tmpPathSet)
