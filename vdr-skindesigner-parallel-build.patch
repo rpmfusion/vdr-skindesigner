@@ -1,0 +1,21 @@
+Build libskindesignerapi before the plugin objects.
+
+With parallel make the plugin objects can compile before
+libskindesignerapi.pc exists. skindesigner.o, config.o and setup.o then
+get an empty LIBSKINDESIGNERAPIVERSION and the plugin logs an empty
+libskindesigner API version, and the final link can start before the
+library it links against is built.
+
+--- a/Makefile
++++ b/Makefile
+@@ -130,6 +130,10 @@ libskindesignerapi:
+ 
+ subprojects: libskindesignerapi
+ 
++# The objects embed the API version read from libskindesignerapi.pc and the
++# plugin links against the library, so neither may start before it is built.
++$(OBJS): | subprojects
++
+ install-subprojects:
+ 	$(MAKE) -C libskindesignerapi install
+ 

@@ -1,0 +1,28 @@
+Link libskindesignerapi with the caller's LDFLAGS and CXXFLAGS.
+
+The library Makefile assigned LDFLAGS instead of appending to it, which
+threw away the linker flags a distribution passes in (full RELRO, BIND_NOW,
+build notes). The plugin itself already links with $(CXXFLAGS) and
+$(LDFLAGS); link the library the same way so compile and link options
+match (e.g. -flto).
+
+--- a/libskindesignerapi/Makefile
++++ b/libskindesignerapi/Makefile
+@@ -20,7 +20,7 @@ ARCHIVE = $(LIBNAME)-$(VERSION)
+ 
+ PKGCFG = $(if $(VDRDIR),$(shell pkg-config --silence-errors --variable=$(1) $(VDRDIR)/vdr.pc),$(shell pkg-config --silence-errors --variable=$(1) vdr || pkg-config --variable=$(1) ../../../../vdr.pc))
+ CXXFLAGS = $(call PKGCFG,cxxflags)
+-LDFLAGS = -shared -Wl,-soname,$(SONAME)
++LDFLAGS += -shared -Wl,-soname,$(SONAME)
+ 
+ DEFINES += -DLIBAPIVERSION=$(MAJOR) -DLIBVERSION=\"$(VERSION)\"
+ INCLUDES +=
+@@ -48,7 +48,7 @@ $(DEPFILE): Makefile
+ 
+ $(TARGET_LIB): $(OBJS)
+ 	@echo LD $@
+-	$(Q)$(CXX) ${LDFLAGS} -o $@ $^
++	$(Q)$(CXX) $(CXXFLAGS) ${LDFLAGS} -o $@ $^
+ 	if [ -n "$(LCLBLD)" ] ; then \
+ 		ln -s $(TARGET_LIB) $(LIBNAME).so ; \
+ 		ln -s $(TARGET_LIB) $(SONAME) ; \

@@ -13,9 +13,13 @@ that ships its own themes/<theme>/logos still wins (see imagecache.c).
 The trailing slash is kept: FileExists(path, name, ext) concatenates the
 three without a separator.
 
---- a/Makefile	2026-08-20 01:15:11.717757004 +0200
-+++ b/Makefile	2026-08-20 01:15:19.924880323 +0200
-@@ -21,9 +21,13 @@
+README and conf/skindesigner.conf document the new default; the README's
+logo section also described a skins/<skin>/logos lookup the code no
+longer does.
+
+--- a/Makefile
++++ b/Makefile
+@@ -21,9 +21,13 @@ LIBDIR = $(call PKGCFG,libdir)
  LOCDIR = $(call PKGCFG,locdir)
  PLGCFG  = $(call PKGCFG,plgcfg)
  VDRCONFDIR = $(call PKGCFG,configdir)
@@ -30,7 +34,7 @@ three without a separator.
  
  ### The compiler options:
  export CFLAGS   = $(call PKGCFG,cflags)
-@@ -47,6 +51,7 @@
+@@ -47,6 +51,7 @@ SOFILE = libvdr-$(PLUGIN).so
  DEFINES += -DPLUGIN_NAME_I18N='"$(PLUGIN)"' $(CONFIG)
  DEFINES += $(shell xml2-config --cflags)
  DEFINES += -DSCRIPTFOLDER='"$(SKINDESIGNER_SCRIPTDIR)"'
@@ -38,9 +42,50 @@ three without a separator.
  DEFINES += -D__STL_CONFIG_H
  
  INCLUDES += $(shell pkg-config --cflags freetype2 fontconfig)
---- a/config.c	2026-08-20 01:15:11.717779541 +0200
-+++ b/config.c	2026-08-20 01:15:22.294918114 +0200
-@@ -44,8 +44,8 @@
+--- a/README
++++ b/README
+@@ -85,7 +85,7 @@ The following paths can be set at startup:
+     (Default: <ConfigDirectory>/plugins/skindesigner/installerskins/)
+ 
+ -l <LOGOPATH>, --logopath=<LOGOPATH>
+-    Path to common logo set for all skins (Default: <ResourceDirectory>/plugins/skindesigner/logos/)
++    Path to common logo set for all skins (Default: <ResourceDirectory>/logos/)
+ 
+ -e path, --epgimages=path
+     Path to the epgimages (Default: <CacheDirectory>/epgimages/)
+@@ -123,13 +123,13 @@ configured vdrOsd Font is used as default.
+ Channel Logos
+ -------------
+ 
+-Since each XML skin is responsible for it's used channel logos, skindesigner
+-searches for channel logos only in the skin dependend directory
++A skin theme can ship its own channel logos in
+ 
+-<ResourceDirectory>/plugins/skindesigner/skins/<skinname>/logos
++<SKINPATH>/<skinname>/themes/<themename>/logos
+ 
+-Each copy your used logos directly to this directory or set a symbolic link to
+-a common channellogo directory.
++If that directory does not exist, skindesigner uses the common logo set in
++<LOGOPATH>, by default VDR's shared, skin independent logo directory
++<ResourceDirectory>/logos, where distributions install channel logo packages.
+ 
+ I recommend to use channel logos from https://github.com/3PO/Senderlogos
+ To download them just change in the directory you want to place the logos
+--- a/conf/skindesigner.conf
++++ b/conf/skindesigner.conf
+@@ -10,7 +10,7 @@
+ 
+ #--logopath=<LOGOPATH>
+ #    Path to the common logo set for all skins
+-#    (Default: <ResourceDirectory>/plugins/skindesigner/logos/)
++#    (Default: <ResourceDirectory>/logos/)
+ 
+ #--epgimages=path
+ #    Path to the epgimages
+--- a/config.c
++++ b/config.c
+@@ -44,8 +44,8 @@ void cDesignerConfig::SetPathes(void) {
          skinPath = cString::sprintf("%s/skins/", cPlugin::ResourceDirectory(PLUGIN_NAME_I18N));
      if (!installerSkinPathSet)
          installerSkinPath = cString::sprintf("%s/installerskins/", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));

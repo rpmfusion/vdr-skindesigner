@@ -3,11 +3,11 @@
 %global __provides_exclude_from ^%{vdr_libdir}/.*\\.so.*$
 
 Name:           vdr-skindesigner
-Version:        1.3.0
-Release:        4%{?dist}
-Summary:        A VDR skinning engine that displays XML based Skins
-License:        GPL-2.0-or-later
 Epoch:          1
+Version:        1.3.1
+Release:        1%{?dist}
+Summary:        VDR skin engine for skins written in XML
+License:        GPL-2.0-or-later
 URL:            https://gitlab.com/kamel5/skindesigner
 Source0:        %{url}/-/archive/%{version}/%{sname}-%{version}.tar.bz2
 # Plugin parameters passed by runvdr. Fedora specific, not in upstream.
@@ -18,146 +18,160 @@ Patch0:         %{name}-fsf-address.patch
 # For upstream: default the channel logo path to VDR's shared <resdir>/logos
 # instead of a plugin private directory the plugin never installs.
 Patch1:         %{name}-logopath.patch
+# For upstream: with parallel make the plugin compiled in an empty
+# libskindesignerapi version and could link before the library existed.
+Patch2:         %{name}-parallel-build.patch
+# For upstream: libskindesignerapi dropped the distribution LDFLAGS.
+Patch3:         %{name}-api-ldflags.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  gettext
-BuildRequires:  pkgconfig(libcurl)
-BuildRequires:  pkgconfig(libxml-2.0)
-BuildRequires:  pkgconfig(freetype2)
-BuildRequires:  pkgconfig(fontconfig)
 BuildRequires:  pkgconfig(cairo)
+BuildRequires:  pkgconfig(fontconfig)
+BuildRequires:  pkgconfig(freetype2)
+BuildRequires:  pkgconfig(libcurl)
+BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(librsvg-2.0)
-BuildRequires:  libjpeg-turbo-devel
+BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  vdr-devel
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
+# libskindesignerapi makes no ABI promise beyond this source tree, so the
+# plugin needs the library from its own build.
+Requires:       libskindesignerapi%{?_isa} = %{epoch}:%{version}-%{release}
+# The bundled skins; without them only skins from the installer are usable.
+Recommends:     %{name}-data = %{epoch}:%{version}-%{release}
 # Channel logos are optional artwork read from <resdir>/logos at runtime.
 Recommends:     vdr-channellogos
 # Timer conflict info is pulled through VDR's service API behind a
 # GetPlugin("epgsearch") null check, exactly like the epg2vdr and
 # remotetimers integrations that were never hard requirements either.
 Recommends:     vdr-epgsearch
+# The skin installer in the setup menu clones and updates skins with git.
+Recommends:     git-core
 
 %description
-SkinDesigner is a powerful tool to create VDR Skins based on Skindesigner
-specific XML Code. The following documentation shows the SkinDesigner
-"internals" so that new Skinners get easily an overview how Skindesigner works.
-Hopefully all your open questions are answered, if not, feel free to ask in
-VDR Portal.
+Skindesigner is a skin engine for the Video Disk Recorder (VDR). Skins are
+written in Skindesigner's XML description language instead of C++, and any
+number of them can be installed side by side. Further skins can be
+installed from the Skindesigner skin repository through the setup menu.
 
 %package data
-Summary:       Icons xml files for %{name}
-Group:         Applications/Multimedia
-BuildArch:     noarch
-Requires:      %{name} = %{epoch}:%{version}-%{release}
+Summary:        Bundled skins and themes for %{name}
+BuildArch:      noarch
+Requires:       %{name} = %{epoch}:%{version}-%{release}
 
 %description data
-This package contains icons and xml files.
+The MetrixHD and Estuary4VDR skins for %{name}, with their VDR themes.
 
 %package -n libskindesignerapi
-Summary:        Library files for %{name}
+Summary:        Library that lets VDR plugins draw their OSD through Skindesigner
 
 %description -n libskindesignerapi
-Library which provides the Skindesigner API to other VDR Plugins.
-VDR Plugins using this API are able to use all Skindesigner
+Library which provides the Skindesigner API to other VDR plugins.
+VDR plugins using this API are able to use all Skindesigner
 facilities to display their OSD representation.
 
 %package -n libskindesignerapi-devel
 Summary:        Development files for libskindesignerapi
 Requires:       libskindesignerapi%{?_isa} = %{epoch}:%{version}-%{release}
+# The public headers include VDR's own.
 Requires:       vdr-devel
 
 %description -n libskindesignerapi-devel
 Development files for libskindesignerapi.
 
 %prep
-%autosetup -p1 -n skindesigner-%{version}
+%autosetup -p1 -n %{sname}-%{version}
 
-sed -i -e 's|PREFIX ?= /usr/local|PREFIX ?= /usr|g' libskindesignerapi/Makefile
-sed -i -e 's|LIBDIR ?= $(PREFIX)/lib|LIBDIR ?= %{_libdir}/|g' libskindesignerapi/Makefile
-sed -i -e 's|PCDIR  ?= $(PREFIX)/lib/pkgconfig|PCDIR  ?= %{_libdir}/pkgconfig|g' libskindesignerapi/Makefile
-
-# changed permission due rpmlint warning E: non-executable-script
-chmod a+x scripts/{temperatures.g2v,vdrstats.default}
+# libskindesignerapi installs below /usr/local by default. Its paths can't
+# be set on the make command line: that would override the plugin's LIBDIR.
+sed -i \
+    -e 's|^PREFIX ?= .*|PREFIX ?= %{_prefix}|' \
+    -e 's|^LIBDIR ?= .*|LIBDIR ?= %{_libdir}|' \
+    -e 's|^PCDIR  ?= .*|PCDIR  ?= %{_libdir}/pkgconfig|' \
+    libskindesignerapi/Makefile
 
 %build
-%{set_build_flags}
 %make_build
 
 %install
-# make install would install the themes under /etc, let's not use that
-make install-subprojects install-lib install-i18n DESTDIR=%{buildroot} INSTALL="install -p"
-# install the themes to the custom location used in Fedora
-install -dm 755 %{buildroot}%{vdr_vardir}/themes
-install -pm 644 themes/*.theme %{buildroot}%{vdr_vardir}/themes/
-# install the skins to the custom location used in Fedora
-install -dm 755 %{buildroot}%{vdr_resdir}/plugins/%{sname}/skins
-cp -pR skins/* %{buildroot}%{vdr_resdir}/plugins/%{sname}/skins
-# install the dtd to the custom location used in Fedora
-install -dm 755 %{buildroot}%{vdr_resdir}/plugins/%{sname}/dtd
-cp -pR dtd/* %{buildroot}%{vdr_resdir}/plugins/%{sname}/dtd
-# install the scripts to the custom location used in Fedora
-install -dm 755 %{buildroot}%{vdr_resdir}/plugins/%{sname}/scripts
-cp -pR scripts/* %{buildroot}%{vdr_resdir}/plugins/%{sname}/scripts
-# create path where XML skins are installed by the Skindesigner Installer
-install -dm 755 %{buildroot}%{vdr_resdir}/plugins/%{sname}/installerskins/
+# Upstream's install target derives every path from vdr.pc and puts each
+# part where the plugin looks for it: themes in <configdir>/themes, the only
+# place stock VDR reads them from; skins and their DTDs below
+# <resdir>/plugins; the scripts in the compiled-in <libdir>/skindesigner.
+%make_install
 
-# skindesigner.conf
+# The library install only creates the unversioned link.
+ldconfig -n %{buildroot}%{_libdir}
+
+# The skin installer clones into <configdir>/plugins/skindesigner/installerskins
+# as the vdr user. Those skins reference their DTDs as ../../../dtd, which
+# resolves to the dtd link next to that directory.
+install -dm 755 %{buildroot}%{vdr_configdir}/plugins/%{sname}/installerskins
+ln -s %{vdr_resdir}/plugins/%{sname}/dtd \
+    %{buildroot}%{vdr_configdir}/plugins/%{sname}/dtd
+
 install -Dpm 644 %{SOURCE1} \
     %{buildroot}%{_sysconfdir}/sysconfig/vdr-plugins.d/%{sname}.conf
 
-# install missing symlink (was giving no-ldconfig-symlink rpmlint errors)
-ldconfig -n %{buildroot}%{_libdir}
-
-#
-mkdir -p %{buildroot}/etc/vdr/plugins/skindesigner/
-ln -s %{vdr_resdir}/plugins/skindesigner/dtd %{buildroot}/%{vdr_configdir}/plugins/skindesigner/
-
 %find_lang %{name}
-
-%post -n libskindesignerapi -p /sbin/ldconfig
-
-%postun -n libskindesignerapi -p /sbin/ldconfig
 
 %check
 # vdr resolves VDRPluginCreator after dlopen; a plugin without that export
 # is broken even if it links cleanly
 nm -D --defined-only %{buildroot}%{vdr_libdir}/libvdr-%{sname}.so.%{vdr_apiversion} | grep -q ' VDRPluginCreator$'
-# the compiled-in default logo path must be the shared one vdr-channellogos fills
-strings %{buildroot}%{vdr_libdir}/libvdr-%{sname}.so.%{vdr_apiversion} \
-  | grep -qx '%{vdr_resdir}/logos'
+# The compiled-in default logo path must be the shared one vdr-channellogos
+# fills, and the compiled-in script path the one the scripts are installed to.
+strings %{buildroot}%{vdr_libdir}/libvdr-%{sname}.so.%{vdr_apiversion} > strings.txt
+grep -qx '%{vdr_resdir}/logos' strings.txt
+grep -qx '%{vdr_libdir}/%{sname}/scripts' strings.txt
+test -x %{buildroot}%{vdr_libdir}/%{sname}/scripts/vdrstats.default
 
 %files -f %{name}.lang
 %doc HISTORY README
 %license COPYING
 %config(noreplace) %{_sysconfdir}/sysconfig/vdr-plugins.d/%{sname}.conf
-%{vdr_libdir}/libvdr-*.so.%{vdr_apiversion}
-%dir %{vdr_resdir}/plugins/%{sname}/dtd
-%{vdr_resdir}/plugins/%{sname}/dtd/*
-%dir %{vdr_resdir}/plugins/%{sname}/scripts
-%{vdr_resdir}/plugins/%{sname}/scripts/*
-%{vdr_configdir}/plugins/skindesigner/dtd
-# to be able to install skin repos without the data package
+%{vdr_libdir}/libvdr-%{sname}.so.%{vdr_apiversion}
+%{vdr_libdir}/%{sname}/
 %dir %{vdr_resdir}/plugins/%{sname}/
-%dir %{vdr_resdir}/plugins/%{sname}/installerskins/
+%{vdr_resdir}/plugins/%{sname}/dtd/
+%dir %{vdr_configdir}/plugins/%{sname}/
+%{vdr_configdir}/plugins/%{sname}/dtd
+%dir %attr(-,%{vdr_user},root) %{vdr_configdir}/plugins/%{sname}/installerskins/
 
 %files data
-%dir %{vdr_resdir}/plugins/%{sname}/skins
-%{vdr_resdir}/plugins/%{sname}/skins/*
-%{vdr_vardir}/themes/*.theme
+%{vdr_resdir}/plugins/%{sname}/skins/
+%config(noreplace) %{vdr_configdir}/themes/*.theme
 
 %files -n libskindesignerapi
 %doc libskindesignerapi/README
 %license libskindesignerapi/COPYING
-%{_libdir}/libskindesignerapi.so.*
+%{_libdir}/libskindesignerapi.so.0{,.*}
 
 %files -n libskindesignerapi-devel
-%{_libdir}/pkgconfig/libskindesignerapi.pc
+%{_includedir}/libskindesignerapi/
 %{_libdir}/libskindesignerapi.so
-%dir %{_includedir}/libskindesignerapi
-%{_includedir}/libskindesignerapi/*
+%{_libdir}/pkgconfig/libskindesignerapi.pc
 
 %changelog
+* Sun Sep 27 2026 Dirk Nehring <dnehring@gmx.net> - 1:1.3.1-1
+- Update to 1.3.1
+- Install the themes into /etc/vdr/themes, where stock VDR looks for them;
+  they went to /var/lib/vdr/data/themes, which VDR never reads
+- Install the widget scripts into /usr/lib64/vdr/skindesigner/scripts, the
+  path compiled into the plugin, instead of below /usr/share
+- Own a vdr writable /etc/vdr/plugins/skindesigner/installerskins, where the
+  skin installer actually clones to, instead of an unused directory below
+  /usr/share; recommend git-core, which the installer runs
+- Document the /usr/share/vdr/logos default in README and skindesigner.conf
+- Fix a parallel build race that compiled in an empty libskindesignerapi
+  version (for upstream)
+- Link libskindesignerapi with the distribution LDFLAGS (for upstream)
+- Require the matching libskindesignerapi, recommend the -data subpackage
+- Modernize spec: use upstream's install target, drop Group, the explicit
+  ldconfig scriptlets and %%{set_build_flags}, rewrite the descriptions
+
 * Thu Aug 20 2026 Dirk Nehring <dnehring@gmx.net> - 1:1.3.0-4
 - Default the compiled-in logo path to the shared, skin-independent
   /usr/share/vdr/logos instead of a plugin private directory that is never
